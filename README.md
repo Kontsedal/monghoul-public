@@ -27,7 +27,7 @@
 
 ## What is Monghoul?
 
-Monghoul is a desktop MongoDB client built with Tauri, Bun, React, and Tailwind CSS. It's designed to be fast, lightweight (~33 MB installer), and packed with developer-focused features.
+Monghoul is a desktop MongoDB client. It's designed to be fast, lightweight (~33 MB installer), and packed with developer-focused features.
 
 ### Highlights
 
