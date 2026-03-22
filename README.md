@@ -91,4 +91,4 @@ Please include:
 
 ## Tech Stack
 
-Built with [Tauri v2](https://tauri.app) (Rust host), [Bun](https://bun.sh) (sidecar server), [React 19](https://react.dev), and [Tailwind CSS v4](https://tailwindcss.com). ~33 MB installer, no bundled Chromium.
+Built with [Tauri](https://tauri.app) and [Bun](https://bun.sh). ~33 MB installer, no bundled Chromium.
