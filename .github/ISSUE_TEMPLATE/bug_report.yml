@@ -1,0 +1,109 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Monghoul
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below so we can reproduce and fix the issue.
+
+  - type: input
+    id: version
+    attributes:
+      label: Monghoul version
+      description: You can find this in the app footer or About dialog
+      placeholder: e.g. 1.4.10
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux (.deb)
+        - Linux (.rpm)
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS version
+      placeholder: e.g. Windows 11 23H2, macOS 15.3, Ubuntu 24.04
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      description: Which part of the app is affected?
+      options:
+        - Connection Management
+        - Sidebar & Navigation
+        - Command Palette
+        - Query Editor
+        - Aggregation Builder
+        - Result Viewer (Tree / Table / Raw)
+        - Charts & Visualization
+        - Tabs & Workspace
+        - Data Import
+        - Data Export
+        - Schema Analysis
+        - Test Data Generation
+        - Index Management
+        - Collection Validation Rules
+        - Database & Collection Operations
+        - Theme System
+        - Operation Logs
+        - Background Tasks
+        - MCP Server (AI Integration)
+        - Keyboard Shortcuts
+        - Cluster Monitoring
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: A clear and concise description of what the bug is
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to reproduce the behavior
+      placeholder: |
+        1. Open a connection to ...
+        2. Navigate to ...
+        3. Click on ...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / screen recordings
+      description: If applicable, add screenshots or recordings to help explain the problem
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: |
+        Any other context — e.g. MongoDB version, connection type (direct / replica set),
+        execution mode (standard / fast), error messages from Operation Logs, etc.

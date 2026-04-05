@@ -36,7 +36,7 @@ Monghoul is a desktop MongoDB client. It's designed to be fast, lightweight (~33
 - **8 chart types** with dual axis, date aggregation, and PNG export
 - **Cluster monitoring** with sparkline charts, slow query analysis, and database profiler
 - **70+ MCP tools** for AI assistant integration (Claude, Cursor, Windsurf, Codex, Gemini)
-- **9 built-in themes** and a full theme editor with 3-color generation
+- **10 built-in themes** and a full theme editor with 3-color generation
 - **Import/export** in JSON, CSV, Excel, and cross-instance collection copy
 - **8 auth methods** — SCRAM, x509, LDAP, Kerberos, AWS IAM
 - **SSH tunneling** and SSL/TLS with custom certificates

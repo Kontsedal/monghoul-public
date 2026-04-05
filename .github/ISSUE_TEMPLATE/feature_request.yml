@@ -1,0 +1,71 @@
+name: Feature Request
+description: Suggest a new feature or improvement for Monghoul
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for Monghoul? We'd love to hear it. Please describe the problem you're trying to solve — not just the solution.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      description: Which part of the app does this relate to?
+      options:
+        - Connection Management
+        - Sidebar & Navigation
+        - Command Palette
+        - Query Editor
+        - Aggregation Builder
+        - Result Viewer (Tree / Table / Raw)
+        - Charts & Visualization
+        - Tabs & Workspace
+        - Data Import / Export
+        - Schema Analysis
+        - Test Data Generation
+        - Index Management
+        - Collection Validation Rules
+        - Database & Collection Operations
+        - Theme System
+        - Operation Logs
+        - MCP Server (AI Integration)
+        - Cluster Monitoring
+        - New feature area
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What problem does this solve? Why do you need it?
+      placeholder: I'm always frustrated when ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How do you envision this working? Be as specific or as general as you like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds or alternative approaches you've thought of
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / mockups
+      description: If applicable, add visual references to help explain your idea
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other context — e.g. related features, links, use cases
