@@ -58,13 +58,13 @@ Monghoul has a generous free tier — no time limit, no credit card required.
 
 | | Free | Pro |
 |---|---|---|
-| Connections | 5 | Unlimited |
-| Tabs per panel | 5 | Unlimited |
+| Connections | 8 | Unlimited |
 | Favorites & pinned | 5 each | Unlimited |
+| Multi-panel layout | ✓ | ✓ |
+| Sidebar folders | ✓ | ✓ |
 | Charts & visualization | — | ✓ |
 | Cluster monitoring | — | ✓ |
 | MCP server (AI tools) | — | ✓ |
-| Multi-panel layout | — | ✓ |
 | Document diff | — | ✓ |
 | Custom themes | — | ✓ |
 | Excel import/export | — | ✓ |
