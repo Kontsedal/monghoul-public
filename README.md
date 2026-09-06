@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="https://monghoul.com/og-image.webp" alt="Monghoul — a MongoDB IDE" width="700" />
+  <img src="assets/hero.webp" width="900"
+       alt="The Monghoul workspace: a find query in the editor with schema-aware autocomplete open on a nested shipping field, the matching orders in a table below, and the connection tree on the left" />
 </p>
 
 <h1 align="center">Monghoul</h1>
