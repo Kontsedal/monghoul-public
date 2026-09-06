@@ -1,5 +1,14 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Website & Documentation
-    url: https://monghoul.com/features
-    about: Browse the full feature list and documentation
+  - name: Documentation
+    url: https://monghoul.com/docs/
+    about: The manual — getting started, a reference page per feature area, concepts and troubleshooting
+  - name: Troubleshooting
+    url: https://monghoul.com/docs/troubleshooting/connection-errors/
+    about: Connection problems, server version, TLS, SRV lookups, Atlas IP access and SSH tunnels
+  - name: Changelog
+    url: https://monghoul.com/releases/
+    about: What changed in each version
+  - name: Licences, payments and refunds
+    url: https://monghoul.com/support/
+    about: Anything about a licence or a payment, which is not a bug report

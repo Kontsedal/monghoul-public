@@ -11,8 +11,8 @@ body:
     id: version
     attributes:
       label: Monghoul version
-      description: You can find this in the app footer or About dialog
-      placeholder: e.g. 1.4.10
+      description: The status bar shows it at the bottom left of the window
+      placeholder: e.g. 1.11.0
     validations:
       required: true
 
@@ -40,27 +40,34 @@ body:
       label: Feature area
       description: Which part of the app is affected?
       options:
-        - Connection Management
-        - Sidebar & Navigation
-        - Command Palette
-        - Query Editor
-        - Aggregation Builder
-        - Result Viewer (Tree / Table / Raw)
-        - Charts & Visualization
-        - Tabs & Workspace
-        - Data Import
-        - Data Export
-        - Schema Analysis
-        - Test Data Generation
-        - Index Management
-        - Collection Validation Rules
-        - Database & Collection Operations
-        - Theme System
-        - Operation Logs
-        - Background Tasks
-        - MCP Server (AI Integration)
-        - Keyboard Shortcuts
-        - Cluster Monitoring
+        - Connections and security
+        - Sidebar and navigation
+        - Command palette
+        - Query editor and environment
+        - Schema-aware autocomplete
+        - Aggregation builder
+        - Result views
+        - Document actions and result export
+        - Charts and visualization
+        - Tabs and workspace
+        - Import and export
+        - Schema analysis
+        - Data generation
+        - Index management
+        - Validation rules
+        - Cluster monitoring
+        - Users and roles
+        - Operation logs
+        - Current operations
+        - AI access
+        - Themes and appearance
+        - Interface and display
+        - Keyboard shortcuts
+        - Extended JSON and BSON
+        - Database and collection operations
+        - Licensing and trial
+        - Updates, privacy and support
+        - Write protection
         - Other
     validations:
       required: true
