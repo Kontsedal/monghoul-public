@@ -1,0 +1,13 @@
+{
+  "name": "lookup-vs-embedding",
+  "private": true,
+  "type": "module",
+  "description": "Measures what referencing costs against embedding, on the same MongoDB data.",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "bench": "node run.mjs"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
+  }
+}
