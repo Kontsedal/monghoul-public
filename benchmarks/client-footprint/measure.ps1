@@ -36,9 +36,9 @@ param(
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-# Apps to measure. `Match` is a regex over process names, and it must catch EVERY process the app
-# owns: Electron's renderers and GPU process are where most of the memory is, and a match that only
-# finds the main process reports a number that is wrong by a factor of several.
+# Apps to measure. `Match` is a regex over process names AND `Dir` is the install directory: a
+# process counts only if both agree. The match must catch every process the app owns, because an
+# Electron app keeps most of its memory in renderers and a GPU process.
 $Apps = @(
   @{
     Name  = 'MongoDB Compass'
@@ -50,12 +50,31 @@ $Apps = @(
     Name  = 'Monghoul'
     Dir   = "$env:LOCALAPPDATA\Monghoul"
     Exe   = "$env:LOCALAPPDATA\Monghoul\monghoul.exe"
-    Match = 'monghoul|server'
+    # Anchored, and NOT a bare `server`. The sidecar really is called server.exe, so an unanchored
+    # match caught any process with "server" in its name: on a machine running sqlservr or similar
+    # this script would have summed unrelated memory into a published figure, and `Stop-App` would
+    # have force-killed it. Matching on the executable's PATH is what makes it safe.
+    Match = '^(monghoul|server)$'
   }
 )
 
-function Stop-App([string]$Match) {
-  Get-Process | Where-Object { $_.ProcessName -match $Match } | Stop-Process -Force
+<#
+  Every process belonging to the app, identified by its executable PATH and not by its name alone.
+
+  A name match is not safe here: the Monghoul sidecar is literally `server.exe`, and matching that
+  loosely reaches other people's software. Filtering on the install directory means a process only
+  counts if it was actually launched from the app being measured.
+#>
+function Get-AppProcess([hashtable]$App) {
+  Get-Process -ErrorAction SilentlyContinue |
+    Where-Object {
+      $_.ProcessName -match $App.Match -and
+      $_.Path -and $_.Path.StartsWith($App.Dir, [StringComparison]::OrdinalIgnoreCase)
+    }
+}
+
+function Stop-App([hashtable]$App) {
+  Get-AppProcess $App | Stop-Process -Force
   Start-Sleep -Seconds 4
 }
 
@@ -86,25 +105,23 @@ function Measure-App($App, [int]$Runs, [int]$Settle) {
   $procCount = 0
 
   for ($i = 0; $i -lt $Runs; $i++) {
-    Stop-App $App.Match
+    Stop-App $App
     $sw = [Diagnostics.Stopwatch]::StartNew()
     Start-Process $App.Exe | Out-Null
 
     $win = $null
     while ($sw.Elapsed.TotalSeconds -lt 90 -and -not $win) {
       Start-Sleep -Milliseconds 50
-      $win = Get-Process |
-        Where-Object { $_.ProcessName -match $App.Match -and $_.MainWindowHandle -ne 0 } |
-        Select-Object -First 1
+      $win = Get-AppProcess $App | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
     }
     $times += [math]::Round($sw.Elapsed.TotalSeconds, 3)
 
     Start-Sleep -Seconds $Settle
-    $procs = Get-Process | Where-Object { $_.ProcessName -match $App.Match }
+    $procs = Get-AppProcess $App
     $procCount = $procs.Count
     $rams += [math]::Round((($procs | Measure-Object WorkingSet64 -Sum).Sum / 1MB), 0)
 
-    Stop-App $App.Match
+    Stop-App $App
   }
 
   $t = $times | Sort-Object
