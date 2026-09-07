@@ -46,12 +46,72 @@ const STATUSES = ['draft', 'paid', 'shipped', 'refunded'];
  */
 const pickCustomer = (r) => Math.floor(r() ** 2 * CUSTOMERS);
 
+/**
+ * Recompute the distribution from what is already in the database.
+ *
+ * `--stats-only` exists because the stats write is the LAST thing a six minute insert does, so a
+ * bug there costs the whole run. It also lets the figures be re-derived from the data rather than
+ * from the generator's own counters, which is the better provenance for something a write-up quotes.
+ */
+async function statsOnly(db, build) {
+  const agg = await db
+    .collection('orders_emb')
+    .aggregate(
+      [
+        { $group: { _id: '$customer._id', n: { $sum: 1 } } },
+        {
+          $group: {
+            _id: null,
+            customers: { $sum: 1 },
+            orders: { $sum: '$n' },
+            busiestCount: { $max: '$n' }
+          }
+        }
+      ],
+      { allowDiskUse: true }
+    )
+    .next();
+
+  const top = await db
+    .collection('orders_emb')
+    .aggregate(
+      [
+        { $group: { _id: '$customer._id', n: { $sum: 1 } } },
+        { $sort: { n: -1 } },
+        { $limit: 1 }
+      ],
+      { allowDiskUse: true }
+    )
+    .next();
+
+  const doc = {
+    _id: 'distribution',
+    orders: agg.orders,
+    customers: await db.collection('customers').estimatedDocumentCount(),
+    customersWithOrders: agg.customers,
+    busiestCustomer: top._id,
+    busiestCount: top.n,
+    meanOrdersPerCustomer: Math.round((agg.orders / agg.customers) * 10) / 10,
+    serverVersion: build.version,
+    generatedAt: new Date()
+  };
+  await db.collection('_meta').replaceOne({ _id: 'distribution' }, doc, { upsert: true });
+  console.log(JSON.stringify(doc, null, 2));
+}
+
 async function main() {
   const client = new MongoClient(URI);
   await client.connect();
   const db = client.db(DB);
 
   const build = await db.admin().serverInfo();
+
+  if (process.argv.includes('--stats-only')) {
+    await statsOnly(db, build);
+    await client.close();
+    return;
+  }
+
   console.log(`server ${build.version}, generating ${ORDERS.toLocaleString()} orders across ${CUSTOMERS.toLocaleString()} customers`);
 
   await Promise.all([
@@ -133,9 +193,21 @@ async function main() {
   console.log('indexes built');
 
   // The distribution, written down, because run.mjs reports against it and the write-up quotes it.
-  const busiest = counts.indexOf(Math.max(...counts));
-  const nonZero = counts.filter((n) => n > 0);
-  const mean = nonZero.reduce((a, b) => a + b, 0) / nonZero.length;
+  //
+  // Looped rather than `Math.max(...counts)`. Spreading an array of 200,000 into a call blows the
+  // stack, and it does it at the very END of a six minute insert, which is the worst possible place
+  // to find out.
+  let busiest = 0;
+  let nonZero = 0;
+  let sum = 0;
+  for (let i = 0; i < counts.length; i++) {
+    if (counts[i] > counts[busiest]) busiest = i;
+    if (counts[i] > 0) {
+      nonZero++;
+      sum += counts[i];
+    }
+  }
+  const mean = sum / nonZero;
   await db.collection('_meta').replaceOne(
     { _id: 'distribution' },
     {
