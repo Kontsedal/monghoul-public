@@ -209,6 +209,23 @@ function Get-AppConnection([hashtable]$App, [int[]]$MongoPorts) {
   }
 }
 
+<#
+  The app's summed PRIVATE working set, which is the memory figure to publish.
+
+  Summing WorkingSet64 across processes counts every shared page once per process that maps it, so
+  an eight-process app is charged repeatedly for the same bytes and a single-process one is not.
+  Monghoul measured 723 MB that way and 358 MB this way. Private working set is resident memory the
+  process does not share, so it adds up across processes without double counting, and it is what
+  Task Manager shows in its Details tab.
+
+  Both are reported. Private is the comparable number.
+#>
+function Get-PrivateWorkingSet([int[]]$Ids) {
+  if (-not $Ids) { return 0 }
+  $perf = Get-CimInstance Win32_PerfRawData_PerfProc_Process -ErrorAction SilentlyContinue |
+    Where-Object { $Ids -contains $_.IDProcess }
+  [math]::Round((($perf | Measure-Object WorkingSetPrivate -Sum).Sum / 1MB), 0)
+}
 function Get-DiskFootprint([string]$Dir) {
   if (-not (Test-Path $Dir)) { return $null }
   $files = Get-ChildItem $Dir -Recurse -File -ErrorAction SilentlyContinue
@@ -240,6 +257,7 @@ function Measure-App($App, [int]$Runs, [int]$Settle, [int[]]$MongoPorts) {
   $anyTimes = @()
   $mainTimes = @()
   $rams = @()
+  $privs = @()
   $procCount = 0
   $mongoConns = @()
   $otherConns = 0
@@ -273,6 +291,7 @@ function Measure-App($App, [int]$Runs, [int]$Settle, [int[]]$MongoPorts) {
     $procs = Get-AppProcessAll $App
     $procCount = $procs.Count
     $rams += [math]::Round((($procs | Measure-Object WorkingSet64 -Sum).Sum / 1MB), 0)
+    $privs += Get-PrivateWorkingSet $procs.Id
     $conn = Get-AppConnection $App $MongoPorts
     $mongoConns += $conn.Mongo
     $otherConns = $conn.OtherCount
@@ -283,6 +302,7 @@ function Measure-App($App, [int]$Runs, [int]$Settle, [int[]]$MongoPorts) {
   $a = $anyTimes | Sort-Object
   $m = $mainTimes | Sort-Object
   $r = $rams | Sort-Object
+  $pv = $privs | Sort-Object
   [PSCustomObject]@{
     App                = $App.Name
     DiskMB             = $disk.DiskMB
@@ -294,7 +314,9 @@ function Measure-App($App, [int]$Runs, [int]$Settle, [int[]]$MongoPorts) {
     MedianSecToMainWindow = $m[[math]::Floor($m.Count / 2)]
     AllAnyTimes        = ($anyTimes -join ', ')
     AllMainTimes       = ($mainTimes -join ', ')
-    MedianIdleRAM_MB   = $r[[math]::Floor($r.Count / 2)]
+    MedianPrivateWS_MB = $pv[[math]::Floor($pv.Count / 2)]
+    AllPrivateWS       = ($privs -join ', ')
+    MedianWorkingSet_MB = $r[[math]::Floor($r.Count / 2)]
     AllRAM             = ($rams -join ', ')
     DbConnections      = (($mongoConns | Sort-Object -Unique) -join ', ')
     OtherConnections   = $otherConns
