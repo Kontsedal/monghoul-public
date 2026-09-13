@@ -106,7 +106,10 @@ $Apps = @(
     # The process carries the product name, space included. install4j hosts the JVM inside this
     # process rather than spawning java.exe, so there is one process and no helper to catch.
     Match       = '^Studio 3T$'
-    WindowTitle = 'Studio 3T for MongoDB'
+    # Loose on purpose. The title carries the EDITION, so it reads "Studio 3T Professional
+    # (formerly Basic) for MongoDB" on one licence and "Studio 3T for MongoDB" on another. Pinning
+    # the exact string made every run wait out the 120 s cap and the app dropped out of a sweep.
+    WindowTitle = 'Studio 3T.*for MongoDB'
   },
   @{
     Name        = 'NoSQLBooster'
@@ -131,6 +134,14 @@ $Apps = @(
     Exe         = "$env:LOCALAPPDATA\Programs\DbSchema\DbSchema.exe"
     Match       = '^DbSchema$'
     WindowTitle = '^DbSchema'
+  },
+  @{
+    Name  = 'TablePlus'
+    Dir   = "${env:ProgramFiles}\TablePlus"
+    Exe   = "${env:ProgramFiles}\TablePlus\TablePlus.exe"
+    Match = '^TablePlus$'
+    # No WindowTitle, for the same reason Monghoul has none: the window draws its own title bar, so
+    # the OS title is empty. Neither app shows a splash screen, so the first window IS the app's.
   },
   @{
     Name  = 'Monghoul'
@@ -328,6 +339,22 @@ if (-not $selected) { throw "No app matched -Only '$Only'." }
 
 Write-Host "Measuring $Runs runs per app. Each run launches the app and closes it." -ForegroundColor Cyan
 Write-Host "Close anything you care about first: this force-stops matching processes.`n"
+
+<#
+  Stop EVERY configured client before the sweep starts, not just the one about to be measured.
+
+  A client left running while another is measured is background load the measured one carries and
+  the next one may not. That happened: a stray Monghoul sat through two competitors' runs and would
+  have been force-stopped before its own, so the competitors would have been measured under load it
+  never faced. Quieting the whole set first is the only way a sweep compares like with like.
+#>
+foreach ($app in $Apps) {
+  $running = Get-AppProcessAll $app
+  if ($running) {
+    Write-Host "stopping $($app.Name): $($running.Count) process(es) already running" -ForegroundColor DarkYellow
+    Stop-App $app
+  }
+}
 
 $results = foreach ($app in $selected) { Measure-App $app $Runs $SettleSeconds $MongoPorts }
 $results | Format-List
