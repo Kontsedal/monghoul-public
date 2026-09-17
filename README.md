@@ -70,14 +70,18 @@ local SQLite database, and there is no account to create.
 
 ## Download
 
-| Platform | Format |
-|---|---|
-| Windows | `.exe` installer |
-| macOS | `.dmg` (Apple silicon and Intel) |
-| Linux | `.deb` and `.rpm` |
+| Platform | Format | Install notes |
+|---|---|---|
+| Windows | `.exe` installer, `.msi` for deployment, or `winget install Monghoul.Monghoul` | [Windows](https://monghoul.com/download/windows/) |
+| macOS | `.dmg` for Apple silicon and Intel, signed and notarized | [macOS](https://monghoul.com/download/mac/) |
+| Linux | `.AppImage`, `.deb` or `.rpm` | [Linux](https://monghoul.com/download/linux/) |
+
+The Linux `.AppImage` arrived in 1.12.2. It runs on any distribution and it is the only Linux
+format the in-app updater can replace. A `.deb` or `.rpm` install updates through your package
+manager instead.
 
 **[Download the latest release](https://github.com/Kontsedal/monghoul-public/releases/latest)**, or
-see [monghoul.com/download](https://monghoul.com/download/) for install notes per platform.
+see [monghoul.com/download](https://monghoul.com/download/) for the installers and the size of each.
 
 Requires **MongoDB 4.4 or newer**. Monghoul refuses an older server with an explicit error rather
 than connecting and failing in unclear ways later. See
