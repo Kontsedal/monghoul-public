@@ -35,9 +35,13 @@ const median = (xs) => {
   const m = s.length >> 1;
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
+/**
+ * Nearest rank: the smallest value with at least p of the sample at or below it. The first version
+ * indexed `floor(n * p)`, which at 20 runs is index 19, the maximum, so its "95th" was the worst run.
+ */
 const pct = (xs, p) => {
   const s = [...xs].sort((a, b) => a - b);
-  return s[Math.min(s.length - 1, Math.floor(s.length * p))];
+  return s[Math.max(0, Math.ceil(s.length * p) - 1)];
 };
 const ms = (n) => (n >= 1000 ? `${(n / 1000).toFixed(2)} s` : n >= 10 ? `${Math.round(n)} ms` : `${n.toFixed(1)} ms`);
 
@@ -192,6 +196,14 @@ async function main() {
     `${meta.docs.toLocaleString()} orders, ${meta.shipped.toLocaleString()} shipped, ` +
       `mean document ${meta.avgObjSize} bytes, ${meta.dataSizeMB} MB of data`
   );
+  // Whether the data fits in the cache decides whether these are memory or disk figures, so say it.
+  // How full it is gets printed after the timings, because right after a restart it is empty and
+  // the warm-ups are what fill it.
+  const cacheGB = async (key) => {
+    const c = (await db.admin().command({ serverStatus: 1 })).wiredTiger?.cache;
+    return c ? (c[key] / 1e9).toFixed(1) : '?';
+  };
+  console.log(`WiredTiger cache ${await cacheGB('maximum bytes configured')} GB`);
   console.log(`page of ${PAGE}, skip ${SKIP.toLocaleString()}, median of ${RUNS} runs after ${WARMUP} warm-up runs\n`);
 
   const rows = [];
@@ -230,6 +242,7 @@ async function main() {
   console.log('\n| Matching | Approach | Median | 95th | Keys examined | Docs examined | Plan |');
   console.log('|---|---|---|---|---|---|---|');
   for (const r of rows) console.log(`| ${r.join(' | ')} |`);
+  console.log(`\n${await cacheGB('bytes currently in the cache')} GB in the WiredTiger cache after the run`);
   await client.close();
 }
 
