@@ -25,9 +25,14 @@ const median = (xs) => {
   const m = s.length >> 1;
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
+/**
+ * Nearest rank: the smallest value with at least p of the sample at or below it. The first version
+ * indexed `floor(n * p)`, which at 20 runs is index 19, the maximum. The write-up published that
+ * column as "95th", so it now says "Slowest of 20", and the table below prints both columns.
+ */
 const pct = (xs, p) => {
   const s = [...xs].sort((a, b) => a - b);
-  return s[Math.min(s.length - 1, Math.floor(s.length * p))];
+  return s[Math.max(0, Math.ceil(s.length * p) - 1)];
 };
 const ms = (n) => (n >= 1000 ? `${(n / 1000).toFixed(2)} s` : `${Math.round(n)} ms`);
 
@@ -40,7 +45,7 @@ async function time(fn) {
     await fn();
     times.push(Number(process.hrtime.bigint() - t) / 1e6);
   }
-  return { median: median(times), p95: pct(times, 0.95) };
+  return { median: median(times), p95: pct(times, 0.95), max: Math.max(...times) };
 }
 
 async function main() {
@@ -115,7 +120,7 @@ async function main() {
   const rows = [];
   const add = async (label, fn) => {
     const r = await time(fn);
-    rows.push([label, ms(r.median), ms(r.p95)]);
+    rows.push([label, ms(r.median), ms(r.p95), ms(r.max)]);
     process.stdout.write(`  ${label}\n`);
   };
 
@@ -131,9 +136,9 @@ async function main() {
     embUpdate(busiestId)
   );
 
-  console.log('\n| Operation | Median | 95th |');
-  console.log('|---|---|---|');
-  for (const [a, b, c] of rows) console.log(`| ${a} | ${b} | ${c} |`);
+  console.log('\n| Operation | Median | 95th | Slowest |');
+  console.log('|---|---|---|---|');
+  for (const [a, b, c, d] of rows) console.log(`| ${a} | ${b} | ${c} | ${d} |`);
 
   // The plan behind the read numbers, so a reader can check them instead of trusting them.
   console.log('\nPlan statistics');
