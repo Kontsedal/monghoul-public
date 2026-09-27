@@ -1,0 +1,13 @@
+{
+  "name": "facet-pagination",
+  "private": true,
+  "type": "module",
+  "description": "Measures one page of results with its total count, as two queries and as $facet.",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "bench": "node run.mjs"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
+  }
+}
