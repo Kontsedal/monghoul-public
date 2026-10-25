@@ -1,0 +1,13 @@
+{
+  "name": "document-size",
+  "private": true,
+  "type": "module",
+  "description": "Measures what the size of a document costs a query that projects two small fields from it.",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "bench": "node run.mjs"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
+  }
+}
