@@ -78,8 +78,8 @@ there is no account to create.
 </table>
 
 <p align="center">
-  <img src="assets/redis.webp" width="460"
-       alt="The Redis key browser in Grouped mode: keys under their prefixes with loaded counts, the session folder open with each key's type and time to live" />
+  <img src="assets/redis.webp" width="760"
+       alt="The Redis key browser in Grouped mode: keys under their prefixes with loaded counts, the session folder open with each key's type and time to live, and beside the list the fields of the hash session:42" />
   <br />
   <sub>Redis and Valkey: the key browser, grouped by prefix</sub>
 </p>
@@ -150,7 +150,7 @@ The free tier is not a trial. It does not expire, it needs no card, and it inclu
 | Schema analysis | 500 sampled docs | Unlimited |
 | Generated test documents | 500 | 100,000 |
 | Operation log entries | 250 | Unlimited |
-| MongoDB authentication | No auth, user and password, SCRAM | Plus X.509, LDAP, Kerberos, AWS IAM |
+| MongoDB authentication | No auth, user and password, SCRAM | Plus X.509, LDAP, Kerberos, AWS IAM, OIDC |
 | Charts and visualization | — | ✓ |
 | Cluster Monitor | — | ✓ |
 | AI access, the MCP server | — | ✓ |
