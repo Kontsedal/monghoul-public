@@ -1,0 +1,25 @@
+SELECT avg(duration_ms) FROM blog10m.events WHERE event_time >= '2026-09-10 00:00:00' AND event_time < '2026-09-10 01:00:00'
+--- plan
+Output: avg(duration_ms)
+
+Aggregating
+│  Keys:
+│  Aggregates: avg(duration_ms)
+│  Skip merging: 0
+└──ReadFromMergeTree (blog10m.events)
+      Read type: Default
+      Parts: 1 | Granules: 1221
+      Output: duration_ms
+      Prewhere filter
+      Prewhere filter column:  event_time < \'2026-09-10 01:00:00\' AND event_time >= \'2026-09-10 00:00:00\'
+      Indexes:
+        PrimaryKey
+          Keys:
+            event_time
+          Condition: and((event_time in (-Inf, 1789001999]), (event_time in [1788998400, +Inf)))
+          Parts: 1/1
+          Granules: 1221/1221
+          Search Algorithm: generic exclusion search
+        Ranges: 1
+--- granules that hold a tenant boundary
+998	1221
